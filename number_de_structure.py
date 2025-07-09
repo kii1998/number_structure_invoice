@@ -102,33 +102,36 @@ if __name__ == "__main__":
     solutions_list = find_all_solutions_at_least_3(N_input)
     print(f"计算完成！共找到 {len(solutions_list)} 组解。")
     
-    print("\n步骤2: 按 |x-y| 排序, 选出初始前10名。")
+    print("\n步骤2: 按 |x-y| 排序, 选出初始前20名。")
     sorted_by_diff = sorted(solutions_list, key=lambda sol: abs(sol['x'] - sol['y']))
-    top_10_by_diff = sorted_by_diff[:10]
+    top_20_by_diff = sorted_by_diff[:20]
     
-    print("\n步骤3: 对初始前10名进行二次排序...")
-    print("二次排序规则: x和y的质因数总数量(计重复)之和, 数量越多排名越靠前。")
+    print("\n步骤3: 对初始前20名进行二次排序，并保留最大质因数最小的前10名...")
+    print("二次排序规则: x 或 y 的最大质因数, 数值越小排名越靠前。")
 
     # --- 新增逻辑: 计算二次排序键 ---
-    for sol in top_10_by_diff:
+    for sol in top_20_by_diff:
         factors_x = get_prime_factorization(sol['x'])
         factors_y = get_prime_factorization(sol['y'])
-        sol['total_factor_count'] = len(factors_x) + len(factors_y)
+        sol['max_prime_factor'] = max(max(factors_x), max(factors_y))
         sol['fx_str'] = " * ".join(map(str, factors_x))
         sol['fy_str'] = " * ".join(map(str, factors_y))
     # ------------------------------------
 
     # --- 二次排序 ---
-    reranked_solutions = sorted(top_10_by_diff, key=lambda sol: sol['total_factor_count'], reverse=True)
+    reranked_solutions = sorted(top_20_by_diff, key=lambda sol: sol['max_prime_factor'])
 
-    print("\n步骤4: 输出二次排序后的最终结果。")
+    # 保留前 10 名
+    final_solutions = reranked_solutions[:10]
+
+    print("\n步骤4: 输出最终结果（前10名）。")
     print("-" * 80)
     
-    print(f"最终排名 (基于质因数总数): \n")
-    for i, sol in enumerate(reranked_solutions):
-        total_factors = sol['total_factor_count']
+    print(f"最终排名 (基于最大质因数): \n")
+    for i, sol in enumerate(final_solutions):
+        max_pf = sol['max_prime_factor']
         
-        print(f"最终排名 #{i+1}: (质因数总数 = {total_factors})")
+        print(f"最终排名 #{i+1}: (最大质因数 = {max_pf})")
         print(f"  x = {sol['x']:,}")
         print(f"  y = {sol['y']:,}")
         print(f"  -> x 的S集内质因数 S_x = {sol['S_x (x的质因数)']} (个数: {len(sol['S_x (x的质因数)'])})")
